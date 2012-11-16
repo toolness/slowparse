@@ -37,4 +37,12 @@
     equal($("p").getAttribute("data-meh"), "bar");
     equal(sm.serialize(), '<p  id="foo" data-meh="bar">hello</p>');
   });
+  
+  mangleTest("changing element text once works", {
+    html: '<p  id="foo">hello</p>', 
+  }, function() {
+    sm.text($("p"), "bar");
+    equal($("p").textContent, "bar");
+    equal(sm.serialize(), '<p  id="foo">bar</p>');
+  });
 })();

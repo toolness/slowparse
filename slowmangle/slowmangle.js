@@ -16,6 +16,17 @@ var Slowmangle = (function() {
   }
   
   Slowmangle.prototype = {
+    text: function(element, text) {
+      var pi = element.parseInfo;
+      while (element.firstChild)
+        element.removeChild(element.firstChild);
+      var textNode = document.createTextNode(text);
+      element.appendChild(textNode);
+      console.log(pi);
+      this.vsot.splice(pi.openTag.end, pi.closeTag.start - pi.openTag.end,
+                       // TODO: HTML-escape the value.
+                       text);
+    },
     attr: function(element, name, value) {
       var attrNode;
       if (element.hasAttribute(name)) {
