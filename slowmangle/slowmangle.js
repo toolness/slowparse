@@ -22,7 +22,6 @@ var Slowmangle = (function() {
         element.removeChild(element.firstChild);
       var textNode = document.createTextNode(text);
       element.appendChild(textNode);
-      console.log(pi);
       this.vsot.splice(pi.openTag.end, pi.closeTag.start - pi.openTag.end,
                        // TODO: HTML-escape the value.
                        text);
