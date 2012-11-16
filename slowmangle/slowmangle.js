@@ -9,19 +9,22 @@ var Slowmangle = (function() {
     }
   }
   
-  function Slowmangle(html, document) {
+  function Slowmangle(html, document, mutateDOM) {
     this.html = html;
     this.document = document;
+    this.mutateDOM = mutateDOM;
     this.vsot = new VSOT(html);
   }
   
   Slowmangle.prototype = {
     text: function(element, text) {
       var pi = element.parseInfo;
-      while (element.firstChild)
-        element.removeChild(element.firstChild);
-      var textNode = document.createTextNode(text);
-      element.appendChild(textNode);
+      if (this.mutateDOM) {
+        while (element.firstChild)
+          element.removeChild(element.firstChild);
+        var textNode = document.createTextNode(text);
+        element.appendChild(textNode);
+      }
       this.vsot.splice(pi.openTag.end, pi.closeTag.start - pi.openTag.end,
                        // TODO: HTML-escape the value.
                        text);
@@ -31,16 +34,19 @@ var Slowmangle = (function() {
       if (element.hasAttribute(name)) {
         attrNode = findAttrNode(element, name);
         var pi = attrNode.parseInfo;
-        attrNode.nodeValue = value;
+        if (this.mutateDOM)
+          attrNode.nodeValue = value;
         // Assume the value is quoted...
         this.vsot.splice(pi.value.start + 1, 
                          pi.value.end - pi.value.start - 2,
                          // TODO: HTML-escape the value.
                          value);
       } else {
-        attrNode = document.createAttribute(name);
-        attrNode.nodeValue = value;
-        element.attributes.setNamedItem(attrNode);
+        if (this.mutateDOM) {
+          attrNode = document.createAttribute(name);
+          attrNode.nodeValue = value;
+          element.attributes.setNamedItem(attrNode);
+        }
         this.vsot.insert(element.parseInfo.openTag.end - 1,
                          // TODO: HTML-escape the value, maybe name too.
                          ' ' + name + '="' + value + '"');
